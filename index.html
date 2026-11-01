@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#172554">
+<title>Документ — конвертер файлов</title>
+<style>
+:root{--bg:#f3f6fb;--card:#fff;--ink:#172033;--muted:#64748b;--blue:#2457d6;--line:#dbe3ef;--soft:#edf3ff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+header{background:linear-gradient(120deg,#142653,#2457d6);color:white;padding:22px 18px 28px}
+.wrap{max-width:960px;margin:auto}header h1{margin:0;font-size:26px}header p{margin:6px 0 0;color:#dbeafe}
+main{max-width:960px;margin:18px auto;padding:0 14px 36px}.tabs{display:flex;gap:8px;overflow:auto;margin-bottom:14px}.tab{border:1px solid var(--line);background:white;border-radius:12px;padding:10px 14px;white-space:nowrap;cursor:pointer;font-weight:650}.tab.active{background:var(--blue);border-color:var(--blue);color:white}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:14px;box-shadow:0 5px 20px #17255408}
+h2{font-size:19px;margin:0 0 12px}label{display:block;font-weight:650;margin:12px 0 6px}textarea,input,select{width:100%;font:inherit;border:1px solid #cbd5e1;border-radius:11px;padding:11px;background:white;color:var(--ink)}textarea{min-height:220px;resize:vertical}input[type=file]{padding:10px}button{border:0;border-radius:11px;background:var(--blue);color:white;padding:11px 15px;font:inherit;font-weight:700;cursor:pointer}button.secondary{background:var(--soft);color:#1e40af;border:1px solid #c7d7ff}button:disabled{opacity:.5;cursor:not-allowed}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}.hint,.status{color:var(--muted);font-size:14px}.status{margin-top:10px;white-space:pre-wrap}.hidden{display:none!important}.pill{display:inline-block;background:#e7efff;color:#2347a5;border-radius:999px;padding:3px 9px;font-size:12px;font-weight:700}.note{background:#fff8e7;border:1px solid #f3d99b;border-radius:12px;padding:12px;color:#714b00;font-size:14px}.footer{text-align:center;color:var(--muted);font-size:13px;padding:10px}
+@media(max-width:640px){header h1{font-size:23px}.row{grid-template-columns:1fr}.card{padding:14px}textarea{min-height:190px}}
+</style>
+</head>
+<body>
+<header><div class="wrap"><span class="pill">Веб-приложение</span><h1>Документ</h1><p>Создание и конвертация документов на телефоне и компьютере</p></div></header>
+<main>
+<div class="tabs" role="tablist">
+<button class="tab active" data-tab="text">Текст → файл</button>
+<button class="tab" data-tab="convert">Конвертер</button>
+<button class="tab" data-tab="pdftext">PDF → текст</button>
+</div>
+<section id="text" class="panel">
+<div class="card">
+<h2>Создать документ из текста</h2>
+<label for="docTitle">Название файла</label><input id="docTitle" value="Мой документ" placeholder="Например, заявление">
+<label for="textInput">Текст документа</label><textarea id="textInput" placeholder="Напиши или вставь сюда текст..."></textarea>
+<div class="row">
+<div><label for="textFormat">Формат файла</label><select id="textFormat"><option value="pdf">PDF (.pdf)</option><option value="docx">Word (.docx)</option><option value="xlsx">Excel (.xlsx) — текст в ячейках</option><option value="txt">Обычный текст (.txt)</option></select></div>
+<div><label for="language">Язык интерфейса</label><select id="language"><option value="ru">Русский</option><option value="de">Deutsch (частично)</option></select></div>
+</div>
+<div class="actions"><button id="makeFile">Создать и скачать файл</button><button class="secondary" id="clearText">Очистить</button></div>
+<div id="textStatus" class="status" aria-live="polite"></div>
+</div>
+<div class="note">Файлы создаются прямо в браузере. Текст не отправляется на сервер этой страницы. Для DOCX/XLSX/PDF используются библиотеки, загружаемые из интернета.</div>
+</section>
+<section id="convert" class="panel hidden">
+<div class="card">
+<h2>Конвертировать файл</h2>
+<p class="hint">Выбери исходный файл и формат результата. Поддерживаются PDF, DOCX и XLSX. Некоторые преобразования зависят от структуры исходного документа.</p>
+<label for="sourceFile">Исходный файл</label><input id="sourceFile" type="file" accept=".pdf,.docx,.xlsx,.xls,.txt,.csv">
+<div class="row">
+<div><label for="sourceFormat">Формат исходного файла</label><select id="sourceFormat"><option value="auto">Определить автоматически</option><option value="pdf">PDF</option><option value="docx">Word (.docx)</option><option value="xlsx">Excel (.xlsx/.xls)</option><option value="txt">Текст (.txt)</option><option value="csv">CSV</option></select></div>
+<div><label for="targetFormat">Формат результата</label><select id="targetFormat"><option value="pdf">PDF</option><option value="docx">Word (.docx)</option><option value="xlsx">Excel (.xlsx)</option><option value="txt">Текст (.txt)</option></select></div>
+</div>
+<div class="actions"><button id="convertFile">Конвертировать и скачать</button></div>
+<div id="convertStatus" class="status" aria-live="polite"></div>
+</div>
+<div class="note"><b>Важно:</b> PDF → Word/Excel не всегда восстанавливает исходное оформление. Сканированные PDF требуют OCR (распознавания текста); в этой версии распознавание сканов не включено. Защищённые паролем файлы могут не открыться.</div>
+</section>
+<section id="pdftext" class="panel hidden">
+<div class="card">
+<h2>Извлечь текст из PDF</h2>
+<label for="pdfFile">Выбери PDF-файл</label><input id="pdfFile" type="file" accept=".pdf,application/pdf">
+<div class="actions"><button id="extractPdf">Извлечь текст</button><button class="secondary" id="downloadExtract" disabled>Скачать текст (.txt)</button></div>
+<label for="pdfOutput">Распознанный текст</label><textarea id="pdfOutput" placeholder="Текст из PDF появится здесь..." readonly></textarea>
+<div id="pdfStatus" class="status" aria-live="polite"></div>
+</div>
+</section>
+<div class="footer">Документ • версия 1.0 • Для работы нужен интернет</div>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/vfs_fonts.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/docx/8.5.0/docx.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+document.querySelectorAll('.tab').forEach(btn=>btn.addEventListener('click',()=>{
+ document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b===btn));
+ document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('hidden',p.id!==btn.dataset.tab));
+}));
+function safeName(s){return (s||'document').trim().replace(/[\\/:*?"<>|]+/g,'_').slice(0,90)||'document'}
+function downloadBlob(blob,name){const a=document.createElement('a');const u=URL.createObjectURL(blob);a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),1500)}
+function txtBlob(s){return new Blob([s],{type:'text/plain;charset=utf-8'})}
+function checkLib(name){
+ const ok = {
+  pdf: !!window.pdfMake,
+  docx: !!window.docx,
+  xlsx: !!window.XLSX,
+  pdfjs: !!window.pdfjsLib,
+  mammoth: !!window.mammoth
+ };
+ if(!ok[name]) throw Error('Не загрузилась библиотека для формата '+name.toUpperCase()+'. Проверь интернет и обнови страницу. Для другого формата попробуй ещё раз.');
+}
+async function makeFile(text,fmt,title){
+ const name=safeName(title);
+ if(fmt==='txt'){downloadBlob(txtBlob(text),name+'.txt');return}
+ if(fmt==='pdf'){
+  checkLib('pdf');
+  const paragraphs=(text||' ').replace(/\\r/g,'').split('\\n');
+  const content=[];
+  paragraphs.forEach((paragraph,idx)=>{
+   content.push({text: paragraph || ' ', margin:[0,0,0,idx<paragraphs.length-1?6:0]});
+  });
+  window.pdfMake.createPdf({
+   pageSize:'A4',
+   pageMargins:[48,48,48,48],
+   defaultStyle:{font:'Roboto',fontSize:11,lineHeight:1.25},
+   content:content
+  }).download(name+'.pdf');
+  return;
+ }
+ if(fmt==='docx'){
+  checkLib('docx'); const {Document,Packer,Paragraph}=window.docx;
+  const paragraphs=(text||'').split(/\r?\n/).map(line=>new Paragraph({text:line}));
+  const doc=new Document({sections:[{properties:{},children:paragraphs}]});
+  downloadBlob(await Packer.toBlob(doc),name+'.docx');return;
+ }
+ if(fmt==='xlsx'){
+  checkLib('xlsx'); const rows=(text||'').split(/\r?\n/).map(line=>[line]);
+  const ws=XLSX.utils.aoa_to_sheet(rows);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Текст');
+  XLSX.writeFile(wb,name+'.xlsx');return;
+ }
+}
+$('makeFile').addEventListener('click',async()=>{
+ const s=$('textStatus');s.textContent='Создаю файл…';
+ try{await makeFile($('textInput').value,$('textFormat').value,$('docTitle').value);s.textContent='Файл подготовлен. Если загрузка не началась, проверь разрешение браузера на скачивание.'}
+ catch(e){s.textContent='Ошибка: '+e.message}
+});
+$('clearText').addEventListener('click',()=>{$('textInput').value='';$('textStatus').textContent=''});
+async function extractPdf(file){
+ checkLib('pdfjs');pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+ const data=new Uint8Array(await file.arrayBuffer());const pdf=await pdfjsLib.getDocument({data}).promise;let all=[];
+ for(let p=1;p<=pdf.numPages;p++){const page=await pdf.getPage(p);const content=await page.getTextContent();all.push(content.items.map(i=>i.str).join(' '))}
+ return all.join('\n\n');
+}
+$('extractPdf').addEventListener('click',async()=>{
+ const file=$('pdfFile').files[0];if(!file){$('pdfStatus').textContent='Сначала выбери PDF-файл.';return}
+ $('pdfStatus').textContent='Читаю PDF…';
+ try{$('pdfOutput').value=await extractPdf(file);$('downloadExtract').disabled=false;$('pdfStatus').textContent='Готово. Страниц обработано: текстовый слой PDF.'}
+ catch(e){$('pdfStatus').textContent='Ошибка: '+e.message}
+});
+$('downloadExtract').addEventListener('click',()=>downloadBlob(txtBlob($('pdfOutput').value),'tekst-iz-pdf.txt'));
+async function readInput(file,forced){
+ const ext=(forced&&forced!=='auto'?forced:file.name.split('.').pop().toLowerCase());
+ if(ext==='txt'||ext==='csv')return {text:await file.text(),rows:null,ext};
+ if(ext==='pdf')return {text:await extractPdf(file),rows:null,ext};
+ if(ext==='docx'){
+  checkLib('mammoth');
+  const r=await mammoth.extractRawText({arrayBuffer:await file.arrayBuffer()});return {text:r.value,rows:null,ext};
+ }
+ if(ext==='xlsx'||ext==='xls'){
+  const wb=XLSX.read(await file.arrayBuffer(),{type:'array'});const rows=[];
+  wb.SheetNames.forEach((n,idx)=>{if(idx)rows.push(['']);rows.push([n]);XLSX.utils.sheet_to_json(wb.Sheets[n],{header:1,defval:''}).forEach(r=>rows.push(r))});
+  return {text:rows.map(r=>r.join('\t')).join('\n'),rows,ext};
+ }
+ throw Error('Этот формат пока не поддерживается.');
+}
+$('convertFile').addEventListener('click',async()=>{
+ const file=$('sourceFile').files[0];const s=$('convertStatus');
+ if(!file){s.textContent='Сначала выбери файл.';return}
+ s.textContent='Читаю и конвертирую файл…';
+ try{
+  const data=await readInput(file,$('sourceFormat').value);const target=$('targetFormat').value;
+  if(target==='pdf'||target==='docx'||target==='xlsx'||target==='txt'){
+   if(target==='xlsx'&&data.rows){const ws=XLSX.utils.aoa_to_sheet(data.rows);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Конвертация');XLSX.writeFile(wb,safeName(file.name.replace(/\.[^.]+$/,''))+'.xlsx')}
+   else await makeFile(data.text,target,file.name.replace(/\.[^.]+$/,''));
+  }
+  s.textContent='Готово. Проверь загруженный файл и его форматирование.';
+ }catch(e){s.textContent='Ошибка: '+e.message}
+});
+if('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+ // Optional PWA install support can be added after deployment on HTTPS.
+}
+</script>
+</body></html>
